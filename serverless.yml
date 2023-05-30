@@ -1,0 +1,37 @@
+service: buzzbuzz
+
+useDotenv: true
+
+plugins:
+  - serverless-plugin-optimize
+  - serverless-offline
+
+package:
+  excludeDevDependencies: true
+
+custom:
+  serverless-offline:
+    noPrependStageInUrl: true
+
+provider:
+  iamRoleStatements:
+    - Effect: "Allow"
+      Resource: "*"
+      Action:
+        - "cloudformation:DescribeStackResource"
+  name: aws
+  runtime: nodejs18.x
+  region: ${env:AWS_REGION}
+  environment:
+    MONGODB_URI: ${env:MONGODB_URI}
+
+functions:
+  main:
+    handler: ./dist/serverless.handler
+    events:
+      - http:
+          method: ANY
+          path: /
+      - http:
+          method: ANY
+          path: '{proxy+}'
